@@ -1,23 +1,22 @@
 from django.shortcuts import render, HttpResponse, redirect
 import pyrebase
 
+#--------------------------------------Firebase Configuration-------------------------------------     
 firebaseConfig = {
-    'apiKey': "AIzaSyDWLEJLHfKX-z37aW1l8B1M5AMuVyNwrRU",
-    'authDomain': "high-life-281103.firebaseapp.com",
-    'databaseURL': "https://high-life-281103.firebaseio.com",
-    'projectId': "high-life-281103",
-    'storageBucket': "high-life-281103.appspot.com",
-    'messagingSenderId': "322595235555",
-    'appId': "1:322595235555:web:7c78701c27ebbf14cb07d6",
-    'measurementId': "G-SHHW9MZKGW"
+    'apiKey': "Your Key",
+    'authDomain': "------",
+    'databaseURL': "--------",
+    'projectId': "-----",
+    'storageBucket': "-------",
+    'messagingSenderId': "---",
+    'appId': "---",
+    'measurementId': "----"
 }
-# Initialize Firebase
-# firebase.initializeApp(firebaseConfig)
-# firebase.analytics()
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 auth = firebase.auth()
-database= firebase.database()
+database = firebase.database()
+
 
 def authenticate(request):
     if request.method == "POST":
@@ -41,8 +40,12 @@ def signup(request):
       name=request.POST['name']
       email=request.POST['email']
       passw=request.POST['password']
-      user=auth.create_user_with_email_and_password(email,passw)
-      uid = user['localId']
+      try:
+        user=auth.create_user_with_email_and_password(email,passw)
+        uid = user['localId']
+      except:
+        msg = 'Unable to create account'
+        return render(request, 'signup.html',{'msg':msg})
       data={'name':name,'status':"1"}
       database.child("users").child(uid).child('details').child(data)
       return render(request, 'signin.html')
