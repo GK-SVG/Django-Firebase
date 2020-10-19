@@ -1,0 +1,22 @@
+{% if msg %}
+     <script>
+        alert('{{msg}}')
+     </script>
+{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django-Firebase</title>
+</head>
+<body>
+    <form action="{% url 'authenticate' %}" method='POST'>
+        {% csrf_token %}
+        Email: <input type="email", name="email"><br>
+        Password: <input type="password", name="password"><br>
+        <input type="submit" value="Signin">
+        <button type="submit" onclick="location.href='{% url 'signup' %}'">Signup</button>
+    </form>
+</body>
+</html>
