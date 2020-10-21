@@ -81,12 +81,40 @@ def create_report(request):
       print('localId===',user_is['users'][0]['localId'])
       uid=user_is['users'][0]['localId']
       email=user_is['users'][0]['email']
-      database.child('users').child(uid).child('reports').child(milli_sec).push(data)
+      database.child('users').child(uid).child('reports').child(milli_sec).set(data)
       return render(request,'welcome.html',{'email':email})
     except KeyError:
       msg= 'Please SignIn first'
       return render(request, 'signin.html',{'msg':msg})
   return render(request,'create_report.html')
 
-   
+
+def retriew_report(request):
+  import datetime
+  id_token= request.session['uid']
+  user_is=authe.get_account_info(id_token)
+  uid=user_is['users'][0]['localId']
+  all_timestamp=database.child('users').child(uid).child('reports').shallow().get().val()
+  print(all_timestamp)
+  time_list=[]
+  for time in all_timestamp:
+    time_list.append(time)
+  time_list.sort(reverse=True)
+  print(time_list)
+  title = []
+  text = []
+  for time in time_list:
+    tit=database.child('users').child(uid).child('reports').child(time).child('title').get().val()
+    title.append(tit)
+    tex=database.child('users').child(uid).child('reports').child(time).child('text').get().val()
+    text.append(tex)
+  print('title==',title)
+  print('text==',text)
+  date=[]
+  for i in time_list:
+    dat= datetime.datetime.fromtimestamp(float(i)).strftime('%H:%M %d-%m-%Y')
+    date.append(dat)
+  combined_data=zip(date,title,text)
+  return render(request,'retriew.html',{'combined_data':combined_data})
+
       
