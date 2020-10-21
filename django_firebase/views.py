@@ -1,20 +1,21 @@
 from django.shortcuts import render, HttpResponse, redirect
 import pyrebase
-
+from django.contrib import auth
+from datetime import datetime
 #--------------------------------------Firebase Configuration-------------------------------------     
 firebaseConfig = {
-    'apiKey': "Your Key",
-    'authDomain': "------",
-    'databaseURL': "--------",
-    'projectId': "-----",
-    'storageBucket': "-------",
-    'messagingSenderId': "---",
-    'appId': "---",
-    'measurementId': "----"
+    'apiKey': "AIzaSyDWLEJLHfKX-z37aW1l8B1M5AMuVyNwrRU",
+    'authDomain': "high-life-281103.firebaseapp.com",
+    'databaseURL': "https://high-life-281103.firebaseio.com",
+    'projectId': "high-life-281103",
+    'storageBucket': "high-life-281103.appspot.com",
+    'messagingSenderId': "322595235555",
+    'appId': "1:322595235555:web:7c78701c27ebbf14cb07d6",
+    'measurementId': "G-SHHW9MZKGW"
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
-auth = firebase.auth()
+authe = firebase.auth()
 database = firebase.database()
 
 
@@ -23,8 +24,9 @@ def authenticate(request):
         email = request.POST['email']
         passw = request.POST['password']
         try:
-            user = auth.sign_in_with_email_and_password(email, passw)
+            user = authe.sign_in_with_email_and_password(email, passw)
             print('user==', user)
+            request.session['uid']=str(user['idToken'])
             return render(request, 'welcome.html', {'email': email})
         except:
             msg = 'Invalid credencials'
@@ -41,12 +43,50 @@ def signup(request):
       email=request.POST['email']
       passw=request.POST['password']
       try:
-        user=auth.create_user_with_email_and_password(email,passw)
+        user=authe.create_user_with_email_and_password(email,passw)
+        #print(user)
         uid = user['localId']
       except:
         msg = 'Unable to create account'
         return render(request, 'signup.html',{'msg':msg})
       data={'name':name,'status':"1"}
-      database.child("users").child(uid).child('details').child(data)
+      database.child("users").child(uid).child('details').push(data)
       return render(request, 'signin.html')
     return render(request, 'signup.html')
+
+
+def logout(request):
+  del request.session['uid']
+  return render(request, 'signin.html')
+
+
+def create_report(request):
+  import time
+  from datetime import datetime,timezone
+  import pytz
+  if request.method=='POST':
+    title=request.POST['title']
+    text=request.POST['text']
+    time_zone = pytz.timezone('Asia/Kolkata')
+    time_now= datetime.now(timezone.utc).astimezone(time_zone)
+    milli_sec=int(time.mktime(time_now.timetuple()))
+    try:
+      id_token= request.session['uid']
+      user_is=authe.get_account_info(id_token)
+      print('user=====',user_is)
+      data={
+        'title':title,
+        'text':text,
+        }
+      print('localId===',user_is['users'][0]['localId'])
+      uid=user_is['users'][0]['localId']
+      email=user_is['users'][0]['email']
+      database.child('users').child(uid).child('reports').child(milli_sec).push(data)
+      return render(request,'welcome.html',{'email':email})
+    except KeyError:
+      msg= 'Please SignIn first'
+      return render(request, 'signin.html',{'msg':msg})
+  return render(request,'create_report.html')
+
+   
+      

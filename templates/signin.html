@@ -13,9 +13,9 @@
 <body>
     <form action="{% url 'authenticate' %}" method='POST'>
         {% csrf_token %}
-        Email: <input type="email", name="email"><br>
-        Password: <input type="password", name="password"><br>
-        <input type="submit" value="Signin">
+        Email: <input type="email", name="email"><br><br>
+        Password: <input type="password", name="password"><br><br>
+        <input type="submit" value="Signin"><br><br>
         <button type="submit" onclick="location.href='{% url 'signup' %}'">Signup</button>
     </form>
 </body>

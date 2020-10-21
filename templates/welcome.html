@@ -1,3 +1,8 @@
+{% if msg %}
+     <script>
+        alert('{{msg}}')
+     </script>
+{% endif %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,5 +12,8 @@
 </head>
 <body>
     You Are Authenticated Your email is {{email}}
+    <button type="submit" onclick="location.href='{% url 'logout' %}'">Logout</button>
+    <button type="submit" onclick="location.href='{% url 'create_report' %}'">Create Report</button>
+    <button type="submit" onclick="location.href='{% url 'logout' %}'">Reterive Report</button>
 </body>
 </html>
