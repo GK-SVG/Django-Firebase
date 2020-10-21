@@ -19,6 +19,7 @@ authe = firebase.auth()
 database = firebase.database()
 
 
+#---------------------------authenticating user---------------------------------------------
 def authenticate(request):
     if request.method == "POST":
         email = request.POST['email']
@@ -37,6 +38,7 @@ def signin(request):
     return render(request, 'signin.html')
 
 
+#------------------------------------Sign-Up user and sending user data into firebase------------------
 def signup(request):
     if request.method=='POST':
       name=request.POST['name']
@@ -60,6 +62,7 @@ def logout(request):
   return render(request, 'signin.html')
 
 
+#--------------------------------------creating form and json data into firebase DB--------------------
 def create_report(request):
   import time
   from datetime import datetime,timezone
@@ -89,6 +92,8 @@ def create_report(request):
   return render(request,'create_report.html')
 
 
+
+#----------------------------------Retrieving json data from firebase DB--------------------------
 def retriew_report(request):
   import datetime
   id_token= request.session['uid']
